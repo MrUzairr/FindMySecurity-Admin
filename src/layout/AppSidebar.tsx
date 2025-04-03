@@ -30,7 +30,7 @@ import {
   Setting
 } from "../icons/index";
 // import SidebarWidget from "./SidebarWidget";
-``
+
 type NavItem = {
   name: string;
   icon: React.ReactNode;
