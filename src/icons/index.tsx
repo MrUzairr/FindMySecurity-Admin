@@ -31,19 +31,19 @@ import PaperPlaneIcon from "./paper-plane.svg";
 import LockIcon from "./lock.svg";
 import EnvelopeIcon from "./envelope.svg";
 import UserIcon from "./user-line.svg";
-import CalenderIcon from "./calender-line.svg";
+// import CalenderIcon from "./calender-line.svg";
 import EyeIcon from "./eye.svg";
 import EyeCloseIcon from "./eye-close.svg";
 import TimeIcon from "./time.svg";
 import CopyIcon from "./copy.svg";
 import ChevronLeftIcon from "./chevron-left.svg";
-import UserCircleIcon from "./user-circle.svg";
+// import UserCircleIcon from "./user-circle.svg";
 import TaskIcon from "./task-icon.svg";
-import ListIcon from "./list.svg";
+// import ListIcon from "./list.svg";
 import TableIcon from "./table.svg";
-import PageIcon from "./page.svg";
-import PieChartIcon from "./pie-chart.svg";
-import BoxCubeIcon from "./box-cube.svg";
+// import PageIcon from "./page.svg";
+// import PieChartIcon from "./pie-chart.svg";
+// import BoxCubeIcon from "./box-cube.svg";
 import PlugInIcon from "./plug-in.svg";
 import DocsIcon from "./docs.svg";
 import MailIcon from "./mail-line.svg";
@@ -113,19 +113,19 @@ export {
   EnvelopeIcon,
   LockIcon,
   UserIcon,
-  CalenderIcon,
+  // CalenderIcon,
   EyeIcon,
   EyeCloseIcon,
   TimeIcon,
   CopyIcon,
   ChevronLeftIcon,
-  UserCircleIcon,
-  ListIcon,
+  // UserCircleIcon,
+  // ListIcon,
   TableIcon,
-  PageIcon,
+  // PageIcon,
   TaskIcon,
-  PieChartIcon,
-  BoxCubeIcon,
+  // PieChartIcon,
+  // BoxCubeIcon,
   PlugInIcon,
   DocsIcon,
   MailIcon,
