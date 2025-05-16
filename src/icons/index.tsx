@@ -39,11 +39,19 @@ import CopyIcon from "./copy.svg";
 import ChevronLeftIcon from "./chevron-left.svg";
 import UserCircleIcon from "./user-circle.svg";
 import TaskIcon from "./task-icon.svg";
+<<<<<<< HEAD
 // import ListIcon from "./list.svg";
 import TableIcon from "./table.svg";
 // import PageIcon from "./page.svg";
 // import PieChartIcon from "./pie-chart.svg";
 // import BoxCubeIcon from "./box-cube.svg";
+=======
+import ListIcon from "./list.svg";
+import TableIcon from "./table.svg";
+import PageIcon from "./page.svg";
+import PieChartIcon from "./pie-chart.svg";
+import BoxCubeIcon from "./box-cube.svg";
+>>>>>>> d29ba99 (Document Verification Code is updated)
 import PlugInIcon from "./plug-in.svg";
 import DocsIcon from "./docs.svg";
 import MailIcon from "./mail-line.svg";
@@ -120,12 +128,21 @@ export {
   CopyIcon,
   ChevronLeftIcon,
   UserCircleIcon,
+<<<<<<< HEAD
   // ListIcon,
   TableIcon,
   // PageIcon,
   TaskIcon,
   // PieChartIcon,
   // BoxCubeIcon,
+=======
+  ListIcon,
+  TableIcon,
+  PageIcon,
+  TaskIcon,
+  PieChartIcon,
+  BoxCubeIcon,
+>>>>>>> d29ba99 (Document Verification Code is updated)
   PlugInIcon,
   DocsIcon,
   MailIcon,

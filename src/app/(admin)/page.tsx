@@ -9,8 +9,13 @@ import DemographicCard from "@/components/ecommerce/DemographicCard";
 
 export const metadata: Metadata = {
   title:
+<<<<<<< HEAD
     "FindMySecurity-Admin",
   description: "FindMySecurity Admin Dashboard",
+=======
+    "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
+  description: "This is Next.js Home for TailAdmin Dashboard Template",
+>>>>>>> d29ba99 (Document Verification Code is updated)
 };
 
 export default function Ecommerce() {

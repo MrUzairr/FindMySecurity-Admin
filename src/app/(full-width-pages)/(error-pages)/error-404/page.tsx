@@ -5,9 +5,15 @@ import Link from "next/link";
 import React from "react";
 
 export const metadata: Metadata = {
+<<<<<<< HEAD
   title:
   "FindMySecurity-Admin",
 description: "FindMySecurity Admin Dashboard",
+=======
+  title: "Next.js Error 404 | TailAdmin - Next.js Dashboard Template",
+  description:
+    "This is Next.js Error 404 page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+>>>>>>> d29ba99 (Document Verification Code is updated)
 };
 
 export default function Error404() {
@@ -47,7 +53,11 @@ export default function Error404() {
       </div>
       {/* <!-- Footer --> */}
       <p className="absolute text-sm text-center text-gray-500 -translate-x-1/2 bottom-6 left-1/2 dark:text-gray-400">
+<<<<<<< HEAD
         &copy; {new Date().getFullYear()} - FindMySecurity
+=======
+        &copy; {new Date().getFullYear()} - TailAdmin
+>>>>>>> d29ba99 (Document Verification Code is updated)
       </p>
     </div>
   );
