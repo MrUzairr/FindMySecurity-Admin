@@ -5,25 +5,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
-<<<<<<< HEAD
 
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
 
-=======
-  BoxCubeIcon,
-  CalenderIcon,
-  ChevronDownIcon,
-  GridIcon,
-  HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
->>>>>>> d29ba99 (Document Verification Code is updated)
   UserManagement,
   Documents,
   JobAd,
@@ -37,11 +23,6 @@ import {
   Feedback,
   Setting
 } from "../icons/index";
-<<<<<<< HEAD
-
-=======
-import SidebarWidget from "./SidebarWidget";
->>>>>>> d29ba99 (Document Verification Code is updated)
 
 type NavItem = {
   name: string;
