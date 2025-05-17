@@ -8,83 +8,136 @@ import {
   Search,
   FileCheck,
   User2,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  X,
 } from "lucide-react";
 
-// Documents
 interface Document {
-  documentId: number;
-  userId: number;
-  status: "pending" | "verified" | "rejected";
+  id: number;
+  url: string;
+  status: "pending" | "verified" | "rejected" | "approved";
   uploadedAt: string;
-  fileUrl: string;
 }
 
-const mockDocuments: Document[] = [
-  {
-    documentId: 101,
-    userId: 1,
-    status: "pending",
-    uploadedAt: "2025-05-08T16:21:43",
-    fileUrl: "https://example.com/doc1.pdf",
-  },
-  {
-    documentId: 102,
-    userId: 1,
-    status: "verified",
-    uploadedAt: "2025-05-08T16:25:10",
-    fileUrl: "https://example.com/doc2.pdf",
-  },
-  {
-    documentId: 103,
-    userId: 2,
-    status: "pending",
-    uploadedAt: "2025-05-08T16:30:15",
-    fileUrl: "https://example.com/doc3.pdf",
-  },
-  {
-    documentId: 104,
-    userId: 3,
-    status: "rejected",
-    uploadedAt: "2025-05-08T16:33:15",
-    fileUrl: "https://example.com/doc4.pdf",
-  },
-];
+interface GroupedDocument {
+  userId: number;
+  userName: string;
+  documents: Document[];
+}
+
+interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface ApiResponse {
+  groupedDocuments: GroupedDocument[];
+  pagination: Pagination;
+}
 
 const DocumentVerification: React.FC = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [documents, setDocuments] = useState<GroupedDocument[]>([]);
   const [search, setSearch] = useState("");
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   useEffect(() => {
-    setDocuments(mockDocuments);
-  }, []);
+    const fetchDocuments = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents?page=${currentPage}`
+        );
+        const data: ApiResponse = await response.json();
+        // Normalize status to lowercase and map "approved" to "verified"
+        const normalizedData = {
+          ...data,
+          groupedDocuments: data.groupedDocuments.map((group) => ({
+            ...group,
+            documents: group.documents.map((doc) => ({
+              ...doc,
+              status:
+                doc.status.toLowerCase() === "approved"
+                  ? "verified"
+                  : (doc.status.toLowerCase() as "pending" | "verified" | "rejected"),
+            })),
+          })),
+        };
+        setDocuments(normalizedData.groupedDocuments);
+        setPagination(normalizedData.pagination);
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleStatusChange = (id: number, newStatus: "verified" | "rejected") => {
-    setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.documentId === id ? { ...doc, status: newStatus } : doc
-      )
-    );
+    fetchDocuments();
+  }, [currentPage]);
+
+  const handleStatusChange = async (userId: number, docId: number, newStatus: "verified" | "rejected") => {
+    setLoading(true);
+    try {
+      const apiStatus = newStatus === "verified" ? "APPROVED" : "REJECTED";
+      const response = await fetch(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents/${docId}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "insomnia/11.1.0",
+          },
+          body: JSON.stringify({ status: apiStatus }),
+        }
+      );
+
+      if (response.ok) {
+        setDocuments((prev) =>
+          prev.map((group) =>
+            group.userId === userId
+              ? {
+                  ...group,
+                  documents: group.documents.map((doc) =>
+                    doc.id === docId ? { ...doc, status: newStatus } : doc
+                  ),
+                }
+              : group
+          )
+        );
+        // Update selectedDocument if it's the same document
+        if (selectedDocument && selectedDocument.id === docId) {
+          setSelectedDocument((prev) => (prev ? { ...prev, status: newStatus } : null));
+        }
+      } else {
+        console.error("Failed to update status:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filtered = documents.filter((doc) => {
+  const filtered = documents.filter((group) => {
     const q = search.toLowerCase();
     return (
-      doc.userId.toString().includes(q) ||
-      doc.documentId.toString().includes(q) ||
-      doc.status.includes(q)
+      group.userId.toString().includes(q) ||
+      group.userName.toLowerCase().includes(q) ||
+      group.documents.some((doc) =>
+        doc.id.toString().includes(q) || doc.status.includes(q)
+      )
     );
   });
 
-  const grouped = filtered.reduce((acc: Record<number, Document[]>, doc) => {
-    acc[doc.userId] = acc[doc.userId] || [];
-    acc[doc.userId].push(doc);
-    return acc;
-  }, {});
-
   return (
-    // <div className="min-h-screen p-8 bg-gradient-to-br from-gray-100 to-blue-100 dark:bg-[#0f172a]">
     <div className="min-h-screen p-8 bg-gradient-to-br from-gray-100 to-blue-100 dark:bg-none dark:bg-gray-950">
-
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-10 text-gray-800 dark:text-gray-200 flex items-center justify-center gap-3">
           <FileCheck className="w-8 h-8 text-blue-600 dark:text-blue-300" /> Document Verification
@@ -94,36 +147,38 @@ const DocumentVerification: React.FC = () => {
           <Search className="absolute left-4 top-3 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
-            placeholder="Search by User ID, Doc ID or Status..."
+            placeholder="Search by User ID, Name, Doc ID or Status..."
             className="w-full py-3 pl-12 pr-4 rounded-xl shadow-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        {Object.keys(grouped).length === 0 ? (
+        {loading ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
+        ) : filtered.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400">No documents found.</p>
         ) : (
-          Object.entries(grouped).map(([userId, docs]) => (
-            <div key={userId} className="mb-12">
+          filtered.map((group) => (
+            <div key={group.userId} className="mb-12">
               <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
                 <User2 className="w-6 h-6 text-blue-600 dark:text-blue-300" />
-                User ID: {userId}
+                {group.userName} (ID: {group.userId})
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {docs.map((doc) => (
+                {group.documents.map((doc) => (
                   <div
-                    key={doc.documentId}
+                    key={doc.id}
                     className="bg-white/70 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-800 transition-all duration-300"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                        Document #{doc.documentId}
+                        Document #{doc.id}
                       </h3>
                       <span
                         className={`text-xs px-3 py-1 rounded-full font-semibold capitalize ${
-                          doc.status === "verified"
+                          (doc.status === "verified" || doc.status === "approved")
                             ? "bg-green-100 text-green-800 border border-green-300 dark:bg-green-950 dark:text-green-300 dark:border-green-800"
                             : doc.status === "rejected"
                             ? "bg-red-100 text-red-800 border border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800"
@@ -145,28 +200,29 @@ const DocumentVerification: React.FC = () => {
                     <div className="flex flex-wrap gap-2 mt-4">
                       <button
                         onClick={() =>
-                          handleStatusChange(doc.documentId, "verified")
+                          handleStatusChange(group.userId, doc.id, "verified")
                         }
                         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:text-green-200 dark:hover:bg-green-700 transition"
+                        disabled={loading}
                       >
                         <CheckCircle size={16} /> Verify
                       </button>
                       <button
                         onClick={() =>
-                          handleStatusChange(doc.documentId, "rejected")
+                          handleStatusChange(group.userId, doc.id, "rejected")
                         }
                         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white bg-red-600 hover:bg-red-700 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700 transition"
+                        disabled={loading}
                       >
                         <XCircle size={16} /> Reject
                       </button>
-                      <a
-                        href={doc.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => setSelectedDocument(doc)}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white bg-gray-800 hover:bg-black dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
+                        aria-label={`View details of document ${doc.id}`}
                       >
                         <Eye size={16} /> View
-                      </a>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -174,12 +230,325 @@ const DocumentVerification: React.FC = () => {
             </div>
           ))
         )}
+
+        {/* Modal for Document Details */}
+        {selectedDocument && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-lg border border-gray-200 dark:border-gray-800">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                  Document Details
+                </h3>
+                <button
+                  onClick={() => setSelectedDocument(null)}
+                  className="p-1 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+                  aria-label="Close modal"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Document ID:</span> {selectedDocument.id}
+                </p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Status:</span>{" "}
+                  <span
+                    className={`px-2 py-1 rounded-full font-semibold capitalize ${
+                      (selectedDocument.status === "verified" || selectedDocument.status === "approved")
+                        ? "bg-green-100 text-green-800 border border-green-300 dark:bg-green-950 dark:text-green-300 dark:border-green-800"
+                        : selectedDocument.status === "rejected"
+                        ? "bg-red-100 text-red-800 border border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800"
+                        : "bg-yellow-100 text-yellow-800 border border-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800"
+                    }`}
+                  >
+                    {selectedDocument.status}
+                  </span>
+                </p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Uploaded on:</span>{" "}
+                  {new Date(selectedDocument.uploadedAt).toLocaleString(undefined, {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">URL:</span>{" "}
+                  <a
+                    href={selectedDocument.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                  >
+                    {selectedDocument.url}
+                  </a>
+                </p>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setSelectedDocument(null)}
+                  className="px-4 py-2 rounded-lg text-sm text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {pagination && (
+          <div className="flex justify-center items-center gap-2 mt-8 flex-wrap">
+            {/* First Page Button */}
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1 || loading}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              aria-label="First page"
+            >
+              <ChevronsLeft size={20} />
+            </button>
+
+            {/* Previous Page Button */}
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1 || loading}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              aria-label="Previous page"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* Page Numbers */}
+            {Array.from({ length: pagination.totalPages }, (_, index) => index + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                  currentPage === page
+                    ? "bg-blue-500 dark:bg-blue-600 text-white"
+                    : "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
+                }`}
+                aria-label={`Page ${page}`}
+                disabled={loading}
+              >
+                {page}
+              </button>
+            ))}
+
+            {/* Next Page Button */}
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pagination.totalPages))}
+              disabled={currentPage === pagination.totalPages || loading}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              aria-label="Next page"
+            >
+              <ChevronRight size={20} />
+            </button>
+
+            {/* Last Page Button */}
+            <button
+              onClick={() => setCurrentPage(pagination.totalPages)}
+              disabled={currentPage === pagination.totalPages || loading}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              aria-label="Last page"
+            >
+              <ChevronsRight size={20} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default DocumentVerification;
+
+
+
+
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import {
+//   CheckCircle,
+//   XCircle,
+//   Eye,
+//   Search,
+//   FileCheck,
+//   User2,
+// } from "lucide-react";
+
+// // Documents
+// interface Document {
+//   documentId: number;
+//   userId: number;
+//   status: "pending" | "verified" | "rejected";
+//   uploadedAt: string;
+//   fileUrl: string;
+// }
+
+// const mockDocuments: Document[] = [
+//   {
+//     documentId: 101,
+//     userId: 1,
+//     status: "pending",
+//     uploadedAt: "2025-05-08T16:21:43",
+//     fileUrl: "https://example.com/doc1.pdf",
+//   },
+//   {
+//     documentId: 102,
+//     userId: 1,
+//     status: "verified",
+//     uploadedAt: "2025-05-08T16:25:10",
+//     fileUrl: "https://example.com/doc2.pdf",
+//   },
+//   {
+//     documentId: 103,
+//     userId: 2,
+//     status: "pending",
+//     uploadedAt: "2025-05-08T16:30:15",
+//     fileUrl: "https://example.com/doc3.pdf",
+//   },
+//   {
+//     documentId: 104,
+//     userId: 3,
+//     status: "rejected",
+//     uploadedAt: "2025-05-08T16:33:15",
+//     fileUrl: "https://example.com/doc4.pdf",
+//   },
+// ];
+
+// const DocumentVerification: React.FC = () => {
+//   const [documents, setDocuments] = useState<Document[]>([]);
+//   const [search, setSearch] = useState("");
+
+//   useEffect(() => {
+//     setDocuments(mockDocuments);
+//   }, []);
+
+//   const handleStatusChange = (id: number, newStatus: "verified" | "rejected") => {
+//     setDocuments((prev) =>
+//       prev.map((doc) =>
+//         doc.documentId === id ? { ...doc, status: newStatus } : doc
+//       )
+//     );
+//   };
+
+//   const filtered = documents.filter((doc) => {
+//     const q = search.toLowerCase();
+//     return (
+//       doc.userId.toString().includes(q) ||
+//       doc.documentId.toString().includes(q) ||
+//       doc.status.includes(q)
+//     );
+//   });
+
+//   const grouped = filtered.reduce((acc: Record<number, Document[]>, doc) => {
+//     acc[doc.userId] = acc[doc.userId] || [];
+//     acc[doc.userId].push(doc);
+//     return acc;
+//   }, {});
+
+//   return (
+//     // <div className="min-h-screen p-8 bg-gradient-to-br from-gray-100 to-blue-100 dark:bg-[#0f172a]">
+//     <div className="min-h-screen p-8 bg-gradient-to-br from-gray-100 to-blue-100 dark:bg-none dark:bg-gray-950">
+
+//       <div className="max-w-7xl mx-auto">
+//         <h1 className="text-4xl font-bold text-center mb-10 text-gray-800 dark:text-gray-200 flex items-center justify-center gap-3">
+//           <FileCheck className="w-8 h-8 text-blue-600 dark:text-blue-300" /> Document Verification
+//         </h1>
+
+//         <div className="mb-8 max-w-md mx-auto relative">
+//           <Search className="absolute left-4 top-3 text-gray-400 dark:text-gray-300" />
+//           <input
+//             type="text"
+//             placeholder="Search by User ID, Doc ID or Status..."
+//             className="w-full py-3 pl-12 pr-4 rounded-xl shadow-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+//             value={search}
+//             onChange={(e) => setSearch(e.target.value)}
+//           />
+//         </div>
+
+//         {Object.keys(grouped).length === 0 ? (
+//           <p className="text-center text-gray-500 dark:text-gray-400">No documents found.</p>
+//         ) : (
+//           Object.entries(grouped).map(([userId, docs]) => (
+//             <div key={userId} className="mb-12">
+//               <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+//                 <User2 className="w-6 h-6 text-blue-600 dark:text-blue-300" />
+//                 User ID: {userId}
+//               </h2>
+
+//               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//                 {docs.map((doc) => (
+//                   <div
+//                     key={doc.documentId}
+//                     className="bg-white/70 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-800 transition-all duration-300"
+//                   >
+//                     <div className="flex justify-between items-center mb-2">
+//                       <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">
+//                         Document #{doc.documentId}
+//                       </h3>
+//                       <span
+//                         className={`text-xs px-3 py-1 rounded-full font-semibold capitalize ${
+//                           doc.status === "verified"
+//                             ? "bg-green-100 text-green-800 border border-green-300 dark:bg-green-950 dark:text-green-300 dark:border-green-800"
+//                             : doc.status === "rejected"
+//                             ? "bg-red-100 text-red-800 border border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800"
+//                             : "bg-yellow-100 text-yellow-800 border border-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800"
+//                         }`}
+//                       >
+//                         {doc.status}
+//                       </span>
+//                     </div>
+
+//                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+//                       Uploaded on:{" "}
+//                       {new Date(doc.uploadedAt).toLocaleString(undefined, {
+//                         dateStyle: "medium",
+//                         timeStyle: "short",
+//                       })}
+//                     </p>
+
+//                     <div className="flex flex-wrap gap-2 mt-4">
+//                       <button
+//                         onClick={() =>
+//                           handleStatusChange(doc.documentId, "verified")
+//                         }
+//                         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:text-green-200 dark:hover:bg-green-700 transition"
+//                       >
+//                         <CheckCircle size={16} /> Verify
+//                       </button>
+//                       <button
+//                         onClick={() =>
+//                           handleStatusChange(doc.documentId, "rejected")
+//                         }
+//                         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white bg-red-600 hover:bg-red-700 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700 transition"
+//                       >
+//                         <XCircle size={16} /> Reject
+//                       </button>
+//                       <a
+//                         href={doc.fileUrl}
+//                         target="_blank"
+//                         rel="noopener noreferrer"
+//                         className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white bg-gray-800 hover:bg-black dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
+//                       >
+//                         <Eye size={16} /> View
+//                       </a>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           ))
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DocumentVerification;
 
 
 
