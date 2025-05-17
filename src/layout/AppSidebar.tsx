@@ -21,7 +21,8 @@ import {
   Analytics,
   Security,
   Feedback,
-  Setting
+  Setting,
+  Profile
 } from "../icons/index";
 
 type NavItem = {
@@ -42,7 +43,7 @@ const navItems: NavItem[] = [
   {
     icon: <UserManagement />,
     name: "User Management",
-    path: "/profile",
+    path: "/user-management",
     // path: "/user-management",
   },
   {
@@ -99,6 +100,12 @@ const navItems: NavItem[] = [
     icon: <Setting />,
     name: "Custom Settings & Platform Configuration",
     path: "/custom-settings",
+  },
+  {
+    icon: <UserManagement />,
+    name: "Update Profile",
+    path: "/profile",
+    // path: "/user-management",
   },
   // {
   //   icon: <CalenderIcon />,

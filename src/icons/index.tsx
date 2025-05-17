@@ -63,6 +63,7 @@ import Analytics from './analytics.svg'
 import Security from './security.svg'
 import Feedback from './feedback.svg'
 import Setting from './gear.svg'
+import Profile from './profile-svgrepo1.svg'
 
 export {
   Setting,
@@ -132,4 +133,5 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
+  Profile
 };
