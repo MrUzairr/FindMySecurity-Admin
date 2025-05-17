@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Search,
   Users,
@@ -18,10 +18,16 @@ interface Role {
   updatedAt: string;
 }
 
+interface Permissions {
+  acceptTerms: boolean;
+  acceptEmails: boolean;
+  premiumServiceNeed?: boolean; // Optional based on API data
+}
+
 interface Client {
   id: number;
   userId: number;
-  permissions: Record<string, any>;
+  permissions: Permissions;
   createdAt: string;
   updatedAt: string;
 }
@@ -29,11 +35,11 @@ interface Client {
 interface IndividualProfessional {
   id: number;
   userId: number;
-  permissions: Record<string, any>;
+  permissions: Permissions;
   createdAt: string;
   updatedAt: string;
   profile: string | null;
-  documents: any[];
+  documents: string[]; // Assuming documents are file names or IDs
 }
 
 interface SecurityCompany {
@@ -49,7 +55,7 @@ interface SecurityCompany {
   website: string;
   servicesRequirements: string[];
   securityServicesOfferings: string[];
-  permissions: Record<string, any>;
+  permissions: Permissions;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,7 +73,7 @@ interface CourseProvider {
   website: string;
   servicesRequirements: string[];
   securityServicesOfferings: string[];
-  permissions: Record<string, any>;
+  permissions: Permissions;
   createdAt: string;
   updatedAt: string;
 }
@@ -108,10 +114,10 @@ interface ApiResponse {
   pagination: Pagination;
 }
 
-interface Tab {
-  name: string;
-  roleId: number;
-}
+// interface Tab {
+//   name: string;
+//   roleId: number;
+// }
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -122,13 +128,13 @@ const UserManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const tabs: Tab[] = [
+  const tabs = useMemo(() => [
     { name: "Clients", roleId: 4 },
     { name: "Professionals", roleId: 3 },
     { name: "Companies", roleId: 5 },
     { name: "Trainers", roleId: 6 },
     { name: "Businesses", roleId: 7 },
-  ];
+  ], []); // Empty dependency array since tabs is static
 
   // Fetch users based on the active tab and current page
   useEffect(() => {
@@ -168,7 +174,7 @@ const UserManagement: React.FC = () => {
     };
 
     fetchUsers();
-  }, [currentPage, activeTab]);
+  }, [currentPage, activeTab, tabs]); // tabs is now memoized
 
   const handleTabChange = (tabName: string) => {
     setActiveTab(tabName);

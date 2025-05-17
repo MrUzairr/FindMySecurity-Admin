@@ -22,7 +22,6 @@ import {
   Security,
   Feedback,
   Setting,
-  Profile
 } from "../icons/index";
 
 type NavItem = {
