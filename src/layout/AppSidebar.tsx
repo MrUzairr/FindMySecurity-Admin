@@ -62,44 +62,44 @@ const navItems: NavItem[] = [
   },
   {
     icon: <Payment />,
-    name: "Payment Management",
-    path: "/payment-management",
+    name: "Orders Management",
+    path: "/orders-management",
   },
-  {
-    icon: <Ai />,
-    name: "AI & Matchmaking Management",
-    path: "/ai-matchmaking",
-  },
-  {
-    icon: <Messaging />,
-    name: "User Communication & Messaging",
-    path: "/user-communication",
-  },
+  // {
+  //   icon: <Ai />,
+  //   name: "AI & Matchmaking Management",
+  //   path: "/ai-matchmaking",
+  // },
+  // {
+  //   icon: <Messaging />,
+  //   name: "User Communication & Messaging",
+  //   path: "/user-communication",
+  // },
   {
     icon: <Education />,
     name: "Training Courses & Education Management",
     path: "/training-courses",
   },
-  {
-    icon: <Analytics />,
-    name: "Analytics & Reporting",
-    path: "/analytics-reporting",
-  },
+  // {
+  //   icon: <Analytics />,
+  //   name: "Analytics & Reporting",
+  //   path: "/analytics-reporting",
+  // },
   {
     icon: <Security />,
     name: "Security & Privacy Controls",
     path: "/security-privacy",
   },
-  {
-    icon: <Feedback />,
-    name: "Support & Feedback Management",
-    path: "/support-feedback",
-  },
-  {
-    icon: <Setting />,
-    name: "Custom Settings & Platform Configuration",
-    path: "/custom-settings",
-  },
+  // {
+  //   icon: <Feedback />,
+  //   name: "Support & Feedback Management",
+  //   path: "/support-feedback",
+  // },
+  // {
+  //   icon: <Setting />,
+  //   name: "Custom Settings & Platform Configuration",
+  //   path: "/custom-settings",
+  // },
   {
     icon: <UserManagement />,
     name: "Update Profile",
