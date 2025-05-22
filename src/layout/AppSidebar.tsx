@@ -53,7 +53,7 @@ const navItems: NavItem[] = [
   {
     icon: <JobAd />,
     name: "Job Ad Management",
-    path: "/job-management",
+    path: "/jobs-management",
   },
   {
     icon: <Subscription />,
