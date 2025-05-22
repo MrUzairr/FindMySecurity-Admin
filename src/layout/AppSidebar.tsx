@@ -15,13 +15,13 @@ import {
   JobAd,
   Subscription,
   Payment,
-  Ai,
-  Messaging,
+  // Ai,
+  // Messaging,
   Education,
-  Analytics,
+  // Analytics,
   Security,
-  Feedback,
-  Setting,
+  // Feedback,
+  // Setting,
 } from "../icons/index";
 
 type NavItem = {

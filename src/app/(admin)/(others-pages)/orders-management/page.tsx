@@ -28,7 +28,7 @@ interface Order {
   currency: string;
   canceledAt: string | null;
   updatedAt: string | null;
-  metadata: any;
+
   user: User;
 }
 
@@ -71,8 +71,9 @@ export default function OrdersPage() {
         const data: OrdersApiResponse = await res.json();
         setOrders(data.orders);
         setTotalPages(data.pagination.totalPages);
-      } catch (err: any) {
-        setError(err.message || 'Unknown error');
+      } catch (err: unknown) {
+        setError('Unknown error');
+        console.error(err);
       } finally {
         setLoading(false);
       }

@@ -15,6 +15,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import Image from "next/image";
 
 enum DocumentStatus {
   PENDING = "pending",
@@ -180,7 +181,7 @@ const DocumentVerification: React.FC = () => {
 
       if (supportedImageTypes.includes(fileType)) {
         return (
-          <img
+          <Image
             src={doc.url}
             alt={`Document ${doc.id}`}
             className="w-full h-auto max-h-[60vh] object-contain rounded-lg border border-gray-200 dark:border-gray-700"

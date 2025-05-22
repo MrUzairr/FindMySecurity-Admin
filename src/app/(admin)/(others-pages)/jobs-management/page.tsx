@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 
 import axios from 'axios';
+import JobApplicantAdsPage from './createJobPopup';
 
 const initialForm = {
   jobTitle: '',
@@ -128,8 +129,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     setForm(initialForm);
     setShowForm(false);
-  } catch (err) {
+  }
+  catch (error: unknown)  {
     setError(editingJobId ? 'Failed to update job. Please try again.' : 'Failed to create job. Please try again.');
+    console.log(error);
   } finally {
     fetchJobs(page, limit, searchTerm); // Refresh job list after create/update
     setLoading(false);
@@ -154,10 +157,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       const data: JobsApiResponse = await res.json();
 
-      setJobs(data.data);
-      setTotalPages(data.meta.totalPages);
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
+      setJobs(data?.data);
+      setTotalPages(data?.meta?.totalPages||1);
+    } catch (err: unknown) {
+      setError( "Unknown error");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -186,8 +190,9 @@ const handleDelete = async (jobId: number) => {
     if (!res.ok) throw new Error('Failed to delete job');
     // Refresh jobs list after delete
     fetchJobs(page, limit, searchTerm);  // assuming you have a function to reload job list
-  } catch (err: any) {
-    setError(err?.message || 'Failed to delete job');
+  } catch (err: unknown) {
+    setError( 'Failed to delete job');
+    console.error(err);
   } finally {
     setLoading(false);
   }
@@ -477,7 +482,7 @@ const handleDelete = async (jobId: number) => {
     </div>
   </div>
 )}
-
+ <JobApplicantAdsPage/>
     </div>
   );
 }
