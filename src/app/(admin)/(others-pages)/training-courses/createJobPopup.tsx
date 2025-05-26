@@ -136,12 +136,15 @@ const CourseApplicantAdsPage = () => {
 
   const handleUpdateStatus = async (appId: number, status: "approved" | "rejected") => {
     try {
-   
+      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      if (!token) return;
 
-      await axios.put(
+      await axios.patch(
         `${API_URL}/course-applications/${appId}`,
         { status },
-      
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
       alert(`Application ${status}`);
