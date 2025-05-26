@@ -224,7 +224,7 @@ const handleDelete = async (jobId: number) => {
   }
 
   return (
-    <div className="container overflow-hidden px-30 py-8 max-w-5xl">
+    <div className="container overflow-hidden px-4 py-8 max-w-full md:max-w-6xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Courses List</h1>
 
       <div className="mb-4 max-w-md">
