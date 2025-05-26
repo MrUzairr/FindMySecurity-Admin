@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 
 import axios from 'axios';
+import CourseApplicantAdsPage from './createJobPopup';
 
 
 const initialForm = {
@@ -223,7 +224,7 @@ const handleDelete = async (jobId: number) => {
   }
 
   return (
-    <div className="container overflow-hidden  px-30 py-8 max-w-7xl">
+    <div className="container overflow-hidden px-30 py-8 max-w-5xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Courses List</h1>
 
       <div className="mb-4 max-w-md">
@@ -427,7 +428,7 @@ const handleDelete = async (jobId: number) => {
     </button>
 
     <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-      {editingJobId ? 'Edit Tender/Contract' : 'Create New Tender/Contract'}
+      {editingJobId ? 'Edit Course' : 'Create New Course'}
     </h2>
 
     {error && <div className="text-red-700 bg-red-100 p-3 rounded mb-3">{error}</div>}
@@ -435,7 +436,7 @@ const handleDelete = async (jobId: number) => {
 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block font-medium mb-1 text-sm text-gray-700">Tender/Contract Title:</label>
+        <label className="block font-medium mb-1 text-sm text-gray-700">Course Title:</label>
         <input
           type="text"
           name="title"
@@ -447,7 +448,7 @@ const handleDelete = async (jobId: number) => {
       </div>
 
       <div>
-        <label className="block font-medium mb-1 text-sm text-gray-700">Tender/Contract Description:</label>
+        <label className="block font-medium mb-1 text-sm text-gray-700">Course Description:</label>
         <textarea
           name="description"
           value={form.description}
@@ -471,7 +472,7 @@ const handleDelete = async (jobId: number) => {
       </div>
 
       <div>
-        <label className="block font-medium mb-1 text-sm text-gray-700">Tender/Contract Type:</label>
+        <label className="block font-medium mb-1 text-sm text-gray-700">Course Type:</label>
         <input
           type="text"
           name="courseType"
@@ -483,7 +484,7 @@ const handleDelete = async (jobId: number) => {
       </div>
 
       <div>
-        <label className="block font-medium mb-1 text-sm text-gray-700">Contract Level:</label>
+        <label className="block font-medium mb-1 text-sm text-gray-700">Course Level:</label>
         <input
           type="text"
           name="courseLevel"
@@ -495,7 +496,7 @@ const handleDelete = async (jobId: number) => {
       </div>
 
       <div>
-        <label className="block font-medium mb-1 text-sm text-gray-700">Contract Duration:</label>
+        <label className="block font-medium mb-1 text-sm text-gray-700">Course Duration:</label>
         <input
           type="text"
           name="duration"
@@ -518,7 +519,7 @@ const handleDelete = async (jobId: number) => {
       </div>
 
       <div>
-        <label className="block font-medium mb-1 text-sm text-gray-700">Contract Start Date:</label>
+        <label className="block font-medium mb-1 text-sm text-gray-700">Course Start Date:</label>
         <input
           type="datetime-local"
           name="endDate"
@@ -614,8 +615,8 @@ const handleDelete = async (jobId: number) => {
   </div>
 </div>
 
-
 )}
+<CourseApplicantAdsPage/>
 
     </div>
   );
