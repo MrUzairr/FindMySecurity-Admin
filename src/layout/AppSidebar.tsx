@@ -85,11 +85,11 @@ const navItems: NavItem[] = [
   //   name: "Analytics & Reporting",
   //   path: "/analytics-reporting",
   // },
-  {
-    icon: <Security />,
-    name: "Security & Privacy Controls",
-    path: "/security-privacy",
-  },
+  // {
+  //   icon: <Security />,
+  //   name: "Security & Privacy Controls",
+  //   path: "/security-privacy",
+  // },
   // {
   //   icon: <Feedback />,
   //   name: "Support & Feedback Management",
@@ -100,12 +100,12 @@ const navItems: NavItem[] = [
   //   name: "Custom Settings & Platform Configuration",
   //   path: "/custom-settings",
   // },
-  {
-    icon: <UserManagement />,
-    name: "Update Profile",
-    path: "/profile",
-    // path: "/user-management",
-  },
+  // {
+  //   icon: <UserManagement />,
+  //   name: "Update Profile",
+  //   path: "/profile",
+  //   // path: "/user-management",
+  // },
   // {
   //   icon: <CalenderIcon />,
   //   name: "Calendar",
