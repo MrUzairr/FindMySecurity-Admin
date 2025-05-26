@@ -192,7 +192,7 @@ const handleDelete = async (jobId: number) => {
     fetchJobs(page, limit, searchTerm);  // assuming you have a function to reload job list
   } catch (err: unknown) {
     setError( 'Failed to delete job');
-    console.error(err);
+    console.error(err); 
   } finally {
     setLoading(false);
   }
