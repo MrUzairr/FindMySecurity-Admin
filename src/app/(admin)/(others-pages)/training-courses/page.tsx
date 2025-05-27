@@ -120,7 +120,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (editingJobId) {
       // Update existing job
       await axios.patch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/course-ads/${editingJobId}`,
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${editingJobId}`,
         payload
       );
       setSuccess('Course updated successfully!');
@@ -128,7 +128,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     } else {
       // Create new job
       await axios.post(
-        'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/course-ads',
+        'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads',
         payload
         
       );
@@ -157,9 +157,16 @@ const handleSubmit = async (e: React.FormEvent) => {
       if (searchTerm.trim()) {
         params.append("search", searchTerm.trim());
       }
-
-      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/course-ads?${params.toString()}`;
-      const res = await fetch(url);
+const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads?${params.toString()}`;
+      const res = await fetch(url, {
+  method: "GET",
+  headers: {
+    Authorization: `Bearer ${token}`,
+   
+  },
+ // Optional: only if cookies or CORS credentials are needed
+});
 
       if (!res.ok) throw new Error("Failed to fetch jobs");
 
@@ -190,10 +197,14 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 const handleDelete = async (jobId: number) => {
   if (!window.confirm('Are you sure you want to delete this job?')) return;
+  const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
   try {
     setLoading(true);
-    const res = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/course-ads/${jobId}`, {
+    const res = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${jobId}`, {
       method: 'DELETE',
+     
+          headers: { Authorization: `Bearer ${token}` },
+        
     });
     if (!res.ok) throw new Error('Failed to delete job');
     // Refresh jobs list after delete

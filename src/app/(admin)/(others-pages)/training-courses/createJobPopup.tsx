@@ -65,11 +65,8 @@ const CourseApplicantAdsPage = () => {
   const fetchAds = async () => {
     try {
      
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZm1zLmNvbSIsInJvbGVJZCI6MSwiaWF0IjoxNzQ3OTI2Nzc1LCJleHAiOjE3NDg1MzE1NzV9.V-WqavGyHTnrS3oCNTMw3yGM5F38ohqU4FtMlsmslPs'
-      if ( !token) {
-        alert("User not authenticated");
-        return;
-      }
+      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      if (!token) return;
 
       
 
