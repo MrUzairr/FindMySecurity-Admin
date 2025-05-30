@@ -18,7 +18,7 @@ import {
   // Ai,
   // Messaging,
   Education,
-  // Analytics,
+   Analytics,
   Security,
   // Feedback,
   // Setting,
@@ -80,11 +80,11 @@ const navItems: NavItem[] = [
     name: "Training Courses & Education Management",
     path: "/training-courses",
   },
-  // {
-  //   icon: <Analytics />,
-  //   name: "Analytics & Reporting",
-  //   path: "/analytics-reporting",
-  // },
+  {
+    icon: <Analytics />,
+    name: "Tender Board Management",
+    path: "/tender-board",
+  },
   // {
   //   icon: <Security />,
   //   name: "Security & Privacy Controls",
