@@ -51,32 +51,9 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, []);
- useEffect(() => {
-    const login = async () => {
-      try {
-        const response = await axios.post(
-          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login`,
-          {
-            email: "admin@fms.com",
-            password: "NewSecurePassword123!",
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  const [Token , setToken]= useState(false);
 
-        const data = response.data;
-        localStorage.setItem('token',data.token) // ✅ already parsed JSON
-        console.log("Login Success:", data);
-      } catch (error) {
-        console.error("Login Failed:", error);
-      }
-    };
 
-    login();
-  }, []);
   const toggleSidebar = () => {
     setIsExpanded((prev) => !prev);
   };

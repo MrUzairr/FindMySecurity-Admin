@@ -232,11 +232,11 @@ const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
     }, 500);
   }
 const handleDelete = async (jobId: number) => {
-  if (!window.confirm('Are you sure you want to delete this job?')) return;
+
   const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
   try {
     setLoading(true);
-    const res = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${jobId}`, {
+    const res = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/tender/${jobId}`, {
       method: 'DELETE',
      
           headers: { Authorization: `Bearer ${token}` },

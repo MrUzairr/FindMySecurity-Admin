@@ -3,6 +3,7 @@ import React, { ReactNode } from "react";
 interface ButtonProps {
   children: ReactNode; // Button text or content
   size?: "sm" | "md"; // Button size
+  type?: "button" | "submit" | "reset"; // Button type
   variant?: "primary" | "outline"; // Button variant
   startIcon?: ReactNode; // Icon before the text
   endIcon?: ReactNode; // Icon after the text
@@ -14,6 +15,7 @@ interface ButtonProps {
 const Button: React.FC<ButtonProps> = ({
   children,
   size = "md",
+  type='button',
   variant = "primary",
   startIcon,
   endIcon,
@@ -43,6 +45,7 @@ const Button: React.FC<ButtonProps> = ({
         disabled ? "cursor-not-allowed opacity-50" : ""
       }`}
       onClick={onClick}
+      type={type}
       disabled={disabled}
     >
       {startIcon && <span className="flex items-center">{startIcon}</span>}
