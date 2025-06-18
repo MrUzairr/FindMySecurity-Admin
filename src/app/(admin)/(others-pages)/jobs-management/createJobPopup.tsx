@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { API_URL } from "../../../../../utils/path";
 import { useRouter } from "next/navigation";
 
 
@@ -34,7 +34,6 @@ const JobApplicantAdsPage = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
- const API_URL = 'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev';
   const fetchAds = async () => {
     try {
      

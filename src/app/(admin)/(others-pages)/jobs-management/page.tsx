@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 
 import axios from 'axios';
 import JobApplicantAdsPage from './createJobPopup';
-
+import { API_URL } from '../../../../../utils/path';
 const initialForm = {
   jobTitle: '',
   jobType: '',
@@ -19,6 +19,7 @@ const initialForm = {
   shiftAndHours: '',
   startDate: '',
   deadline: '',
+  link:'',
 };
 interface User {
   id: number;
@@ -41,6 +42,7 @@ interface Job {
   userId: number;
   jobTitle: string;
   jobType: string;
+  link:string;
   industryCategory: string;
   region: string;
   postcode: string;
@@ -94,50 +96,60 @@ export default function JobsPage() {
 
 
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-
-
-  setLoading(true);
-  setError(null);
-  setSuccess(null);
-
-  try {
-    const payload = {
-      userId: 1,
-      ...form,
-      salaryRate: parseFloat(form.salaryRate),
-    };
-
-    if (editingJobId) {
-      // Update existing job
-      await axios.patch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/jobs/${editingJobId}`,
-        payload
-      );
-      setSuccess('Job updated successfully!');
-      setEditingJobId(null); // reset editing state after update
-    } else {
-      // Create new job
-      await axios.post(
-        'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/jobs',
-        payload
-      );
-      setSuccess('Job created successfully!');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+  
+    try {
+      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      if (!token) throw new Error("No token found in localStorage");
+  
+      const payload = {
+        userId: 1,
+        ...form,
+        salaryRate: parseFloat(form.salaryRate),
+      };
+  
+      if (editingJobId) {
+        // Update existing job
+        await axios.patch(
+          `${API_URL}/admin/jobs/${editingJobId}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add token to Authorization header
+            },
+          }
+        );
+        setSuccess('Job updated successfully!');
+        setEditingJobId(null); // reset editing state after update
+      } else {
+        // Create new job
+        await axios.post(
+          `${API_URL}/admin/jobs`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add token to Authorization header
+            },
+          }
+        );
+        setSuccess('Job created successfully!');
+      }
+  
+      setForm(initialForm);
+      setShowForm(false);
+    } catch (error: unknown) {
+      setError(editingJobId ? 'Failed to update job. Please try again.' : 'Failed to create job. Please try again.');
+      console.log(error);
+    } finally {
+      fetchJobs(page, limit, searchTerm); // Refresh job list after create/update
+      setLoading(false);
     }
-
-    setForm(initialForm);
-    setShowForm(false);
-  }
-  catch (error: unknown)  {
-    setError(editingJobId ? 'Failed to update job. Please try again.' : 'Failed to create job. Please try again.');
-    console.log(error);
-  } finally {
-    fetchJobs(page, limit, searchTerm); // Refresh job list after create/update
-    setLoading(false);
-  }
-};
+  };
 
    async function fetchJobs(page: number, limit: number, searchTerm: string) {
     setLoading(true);
@@ -149,9 +161,15 @@ const handleSubmit = async (e: React.FormEvent) => {
       if (searchTerm.trim()) {
         params.append("search", searchTerm.trim());
       }
-
-      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/jobs?${params.toString()}`;
-      const res = await fetch(url);
+      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      if (!token) throw new Error("No token found in localStorage");
+      const url = `${API_URL}/admin/jobs?${params.toString()}`;
+      const res = await fetch(url,
+       { headers: {
+          Authorization: `Bearer ${token}`, // Add token to Authorization header
+        },
+      }
+      );
 
       if (!res.ok) throw new Error("Failed to fetch jobs");
 
@@ -183,9 +201,15 @@ const handleSubmit = async (e: React.FormEvent) => {
 const handleDelete = async (jobId: number) => {
   if (!window.confirm('Are you sure you want to delete this job?')) return;
   try {
+    const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      if (!token) throw new Error("No token found in localStorage");
     setLoading(true);
-    const res = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/jobs/${jobId}`, {
+    const res = await fetch(`${API_URL}/admin/jobs/${jobId}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+       
+      },
     });
     if (!res.ok) throw new Error('Failed to delete job');
     // Refresh jobs list after delete
@@ -300,6 +324,7 @@ const handleDelete = async (jobId: number) => {
             requiredExperience: job.requiredExperience || '',
             requiredLicences: job.requiredLicences || '',
             shiftAndHours: job.shiftAndHours || '',
+            link: job.link || '', // Assuming you have a link field
             // Add any other fields you have in form
           });
           setShowForm(true);
@@ -482,7 +507,8 @@ const handleDelete = async (jobId: number) => {
     </div>
   </div>
 )}
- <JobApplicantAdsPage/>
+
+ {/* <JobApplicantAdsPage/>*/}
     </div>
   );
 }

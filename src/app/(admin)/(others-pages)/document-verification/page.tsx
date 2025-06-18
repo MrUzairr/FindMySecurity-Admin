@@ -15,11 +15,12 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import { API_URL } from "../../../../../utils/path";
 import Image from "next/image";
 
 enum DocumentStatus {
   PENDING = "pending",
-  VERIFIED = "verified",
+  VERIFIED = "approved",
   REJECTED = "rejected",
   APPROVED = "approved",
 }
@@ -69,12 +70,34 @@ const DocumentVerification: React.FC = () => {
   const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
+  
+      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      if (!token) throw new Error("No token found in localStorage");
+  
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      if (search.trim()) {
+        queryParams.append("search", search.trim());
+      }
+      queryParams.append("page", currentPage.toString());
+  
       const response = await fetch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents?page=${currentPage}`,
-        { headers: { "User-Agent": "insomnia/11.1.0" } }
+        `${API_URL}/admin/documents?${queryParams.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "User-Agent": "insomnia/11.1.0",
+          },
+        }
       );
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+  
       const data: ApiResponse = await response.json();
+  
       const normalizedData = {
         ...data,
         groupedDocuments: data.groupedDocuments.map((group) => ({
@@ -88,15 +111,61 @@ const DocumentVerification: React.FC = () => {
           })),
         })),
       };
+  
       setDocuments(normalizedData.groupedDocuments);
       setPagination(normalizedData.pagination);
     } catch (error) {
-      setNotification({ message: "Failed to fetch documents. Please try again.", type: "error" });
+      setNotification({
+        message: "Failed to fetch documents. Please try again.",
+        type: "error",
+      });
       console.error("Error fetching documents:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentPage]);
+  }, [currentPage, search]);
+  
+  // const fetchDocuments = useCallback(async () => {
+  //   try {
+  //     setLoading(true);
+  //     const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+  //     if (!token) throw new Error("No token found in localStorage");
+  //     const queryParams = new URLSearchParams({
+  //       search: search.toString(),
+  //     });
+  //     const response = await fetch(
+  //       `${API_URL}/admin/documents?${queryParams.toString()}&page=${currentPage}`,
+  //       {
+  //         headers: {
+  //           "Authorization": `Bearer ${token}`, // Add token to Authorization header
+  //           "User-Agent": "insomnia/11.1.0",
+  //         },
+  //       }
+  //     );
+  //     if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+  //     const data: ApiResponse = await response.json();
+  //     const normalizedData = {
+  //       ...data,
+  //       groupedDocuments: data.groupedDocuments.map((group) => ({
+  //         ...group,
+  //         documents: group.documents.map((doc) => ({
+  //           ...doc,
+  //           status:
+  //             doc.status.toLowerCase() === DocumentStatus.APPROVED
+  //               ? DocumentStatus.VERIFIED
+  //               : (doc.status.toLowerCase() as DocumentStatus),
+  //         })),
+  //       })),
+  //     };
+  //     setDocuments(normalizedData.groupedDocuments);
+  //     setPagination(normalizedData.pagination);
+  //   } catch (error) {
+  //     setNotification({ message: "Failed to fetch documents. Please try again.", type: "error" });
+  //     console.error("Error fetching documents:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [currentPage]);
 
   useEffect(() => {
     fetchDocuments();
@@ -119,13 +188,17 @@ const DocumentVerification: React.FC = () => {
     async (userId: number, docId: number, newStatus: DocumentStatus.VERIFIED | DocumentStatus.REJECTED) => {
       setLoading(true);
       try {
+        const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+        if (!token) throw new Error("No token found in localStorage");
+
         const apiStatus = newStatus === DocumentStatus.VERIFIED ? "APPROVED" : "REJECTED";
         const response = await fetch(
-          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents/${docId}/status`,
+          `${API_URL}/admin/documents/${docId}/status`,
           {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`, // Add token to Authorization header
               "User-Agent": "insomnia/11.1.0",
             },
             body: JSON.stringify({ status: apiStatus }),
@@ -215,14 +288,14 @@ const DocumentVerification: React.FC = () => {
     [getFileType]
   );
 
-  const filteredDocuments = documents.filter((group) => {
-    const query = search.toLowerCase();
-    return (
-      group.userId.toString().includes(query) ||
-      group.userName.toLowerCase().includes(query) ||
-      group.documents.some((doc) => doc.id.toString().includes(query) || doc.status.includes(query))
-    );
-  });
+  // const filteredDocuments = documents.filter((group) => {
+  //   const query = search.toLowerCase();
+  //   return (
+  //     group.userId.toString().includes(query) ||
+  //     group.userName.toLowerCase().includes(query) ||
+  //     group.documents.some((doc) => doc.id.toString().includes(query) || doc.status.includes(query))
+  //   );
+  // });
 
   // Clear notification after 5 seconds
   useEffect(() => {
@@ -231,7 +304,6 @@ const DocumentVerification: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [notification]);
-
   return (
     <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
@@ -247,7 +319,7 @@ const DocumentVerification: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
           <input
             type="text"
-            placeholder="Search by User ID, Name, Document ID, or Status"
+            placeholder="Search by User ID, Name, or Status"
             className="w-full py-2.5 pl-10 pr-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -274,10 +346,10 @@ const DocumentVerification: React.FC = () => {
           <div className="flex justify-center items-center py-8">
             <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
           </div>
-        ) : filteredDocuments.length === 0 ? (
+        ) : documents.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400 py-8">No documents match your search criteria.</p>
         ) : (
-          filteredDocuments.map((group) => (
+          documents.map((group) => (
             <section key={group.userId} className="mb-10">
               <h2 className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                 <User2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -295,7 +367,7 @@ const DocumentVerification: React.FC = () => {
                       </h3>
                       <span
                         className={`text-xs px-2.5 py-1 rounded-full font-medium capitalize ${
-                          (doc.status === DocumentStatus.VERIFIED || doc.status === DocumentStatus.APPROVED)
+                          (doc.status === DocumentStatus.VERIFIED && doc.status === DocumentStatus.APPROVED)
                             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                             : doc.status === DocumentStatus.REJECTED
                             ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
@@ -318,7 +390,7 @@ const DocumentVerification: React.FC = () => {
                         disabled={loading}
                         aria-label={`Verify document ${doc.id}`}
                       >
-                        <CheckCircle size={16} /> Verify
+                        <CheckCircle size={16} /> Approved
                       </button>
                       <button
                         onClick={() => handleStatusChange(group.userId, doc.id, DocumentStatus.REJECTED)}
@@ -368,7 +440,7 @@ const DocumentVerification: React.FC = () => {
                     <span className="font-medium">Status:</span>{" "}
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
-                        (selectedDocument.status === DocumentStatus.VERIFIED ||
+                        (selectedDocument.status === DocumentStatus.VERIFIED &&
                           selectedDocument.status === DocumentStatus.APPROVED)
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                           : selectedDocument.status === DocumentStatus.REJECTED
@@ -542,7 +614,7 @@ export default DocumentVerification;
 //       try {
 //         setLoading(true);
 //         const response = await fetch(
-//           `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents?page=${currentPage}`
+//           `https://24a9m2v3ki.execute-api.eu-north-1.amazonaws.com/prod/admin/documents?page=${currentPage}`
 //         );
 //         const data: ApiResponse = await response.json();
 //         const normalizedData = {
@@ -582,7 +654,7 @@ export default DocumentVerification;
 //     try {
 //       const apiStatus = newStatus === "verified" ? "APPROVED" : "REJECTED";
 //       const response = await fetch(
-//         `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents/${docId}/status`,
+//         `https://24a9m2v3ki.execute-api.eu-north-1.amazonaws.com/prod/admin/documents/${docId}/status`,
 //         {
 //           method: "PATCH",
 //           headers: {
@@ -967,7 +1039,7 @@ export default DocumentVerification;
 //       try {
 //         setLoading(true);
 //         const response = await fetch(
-//           `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents?page=${currentPage}`
+//           `https://24a9m2v3ki.execute-api.eu-north-1.amazonaws.com/prod/admin/documents?page=${currentPage}`
 //         );
 //         const data: ApiResponse = await response.json();
 //         // Normalize status to lowercase and map "approved" to "verified"
@@ -1001,7 +1073,7 @@ export default DocumentVerification;
 //     try {
 //       const apiStatus = newStatus === "verified" ? "APPROVED" : "REJECTED";
 //       const response = await fetch(
-//         `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/documents/${docId}/status`,
+//         `https://24a9m2v3ki.execute-api.eu-north-1.amazonaws.com/prod/admin/documents/${docId}/status`,
 //         {
 //           method: "PATCH",
 //           headers: {
