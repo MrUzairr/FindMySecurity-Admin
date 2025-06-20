@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
   Lock,
+  Unlock
 } from "lucide-react";
 import { API_URL } from "../../../../../utils/path";
 import toast, { Toaster } from "react-hot-toast";
@@ -542,7 +543,7 @@ const UserManagement: React.FC = () => {
                           } text-white transition-transform transform hover:scale-105 duration-200`}
                           title={user.blocked ? "Unblock User" : "Block User"}
                         >
-                          <Lock className="w-4 h-4" />
+                         {user.blocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />} 
                           <span className="hidden sm:inline">{user.blocked ? "Unblock" : "Block"}</span>
                           <span className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
                             {user.blocked ? "Unblock User" : "Block User"}
@@ -622,7 +623,7 @@ const UserManagement: React.FC = () => {
                           } text-white transition-transform transform hover:scale-105 duration-200`}
                           title={user.blocked ? "Unblock User" : "Block User"}
                         >
-                          <Lock className="w-4 h-4" />
+                          {user.blocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />} 
                           <span className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
                             {user.blocked ? "Unblock User" : "Block User"}
                           </span>
@@ -699,7 +700,7 @@ const UserManagement: React.FC = () => {
                         } text-white transition-transform transform hover:scale-105 duration-200`}
                         title={user.blocked ? "Unblock User" : "Block User"}
                       >
-                        <Lock className="w-4 h-4" />
+                        {user.blocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />} 
                         <span className="text-xs">{user.blocked ? "Unblock" : "Block"}</span>
                         <span className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
                           {user.blocked ? "Unblock User" : "Block User"}
