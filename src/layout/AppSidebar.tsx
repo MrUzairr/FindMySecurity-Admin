@@ -20,7 +20,7 @@ import {
   Education,
    Analytics,
   Security,
-  // Feedback,
+  Feedback,
   // Setting,
 } from "../icons/index";
 
@@ -43,6 +43,12 @@ const navItems: NavItem[] = [
     icon: <UserManagement />,
     name: "User Management",
     path: "/user-management",
+    // path: "/user-management",
+  },
+  {
+    icon: <Feedback />,
+    name: "User's Reporting Issues",
+    path: "/user-reporting",
     // path: "/user-management",
   },
   {
