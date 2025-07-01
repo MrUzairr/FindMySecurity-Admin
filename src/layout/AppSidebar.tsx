@@ -15,6 +15,8 @@ import {
   JobAd,
   Subscription,
   Payment,
+  FolderIcon,
+  UserLine,
   // Ai,
   // Messaging,
   Education,
@@ -72,9 +74,9 @@ const navItems: NavItem[] = [
     path: "/orders-management",
   },
   // {
-  //   icon: <Ai />,
-  //   name: "AI & Matchmaking Management",
-  //   path: "/ai-matchmaking",
+  //   icon: <FolderIcon />,
+  //   name: "l Management",
+  //   path: "/reported-user-management",
   // },
   // {
   //   icon: <Messaging />,

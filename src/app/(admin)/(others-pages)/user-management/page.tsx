@@ -549,6 +549,17 @@ const UserManagement: React.FC = () => {
                             {user.blocked ? "Unblock User" : "Block User"}
                           </span>
                         </button>
+                          <button
+    onClick={() => window.location.href = `/logs-management?id=${user.id}`}
+    className="relative group flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500 text-white hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 transition-transform transform hover:scale-105 duration-200"
+    title="View Log"
+  >
+    <Eye className="w-4 h-4" />
+    <span className="hidden sm:inline">Logs</span>
+    <span className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+      View Logs
+    </span>
+  </button>
                       </td>
                     </tr>
                   ))}
@@ -628,6 +639,17 @@ const UserManagement: React.FC = () => {
                             {user.blocked ? "Unblock User" : "Block User"}
                           </span>
                         </button>
+                          <button
+    onClick={() => window.location.href = `/logs-management?id=${user.id}`}
+    className="relative group flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500 text-white hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 transition-transform transform hover:scale-105 duration-200"
+    title="View Log"
+  >
+    <Eye className="w-4 h-4" />
+    <span className="hidden sm:inline">Logs</span>
+    <span className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+      View Logs
+    </span>
+  </button>
                       </td>
                     </tr>
                   ))}
@@ -706,6 +728,17 @@ const UserManagement: React.FC = () => {
                           {user.blocked ? "Unblock User" : "Block User"}
                         </span>
                       </button>
+                        <button
+    onClick={() => window.location.href = `/logs-management?id=${user.id}`}
+    className="relative group flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500 text-white hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 transition-transform transform hover:scale-105 duration-200"
+    title="View Log"
+  >
+    <Eye className="w-4 h-4" />
+    <span className=" sm:inline">Logs</span>
+    <span className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+      View Logs
+    </span>
+  </button>
                     </div>
                   </div>
                 </div>

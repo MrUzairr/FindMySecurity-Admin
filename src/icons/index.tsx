@@ -38,6 +38,7 @@ import TimeIcon from "./time.svg";
 import CopyIcon from "./copy.svg";
 import ChevronLeftIcon from "./chevron-left.svg";
 import UserCircleIcon from "./user-circle.svg";
+import UserLine from "./user-line.svg";
 import TaskIcon from "./task-icon.svg";
 // import ListIcon from "./list.svg";
 import TableIcon from "./table.svg";
@@ -125,6 +126,7 @@ export {
   TableIcon,
   // PageIcon,
   TaskIcon,
+  UserLine,
   // PieChartIcon,
   // BoxCubeIcon,
   PlugInIcon,
