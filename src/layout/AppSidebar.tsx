@@ -100,11 +100,11 @@ const navItems: NavItem[] = [
   //   name: "Security & Privacy Controls",
   //   path: "/security-privacy",
   // },
-  // {
-  //   icon: <Feedback />,
-  //   name: "Support & Feedback Management",
-  //   path: "/support-feedback",
-  // },
+  {
+    icon: <Feedback />,
+    name: "Ads Management",
+    path: "/ads-management",
+  },
   // {
   //   icon: <Setting />,
   //   name: "Custom Settings & Platform Configuration",
