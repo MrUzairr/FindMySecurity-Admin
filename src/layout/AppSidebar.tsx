@@ -17,12 +17,14 @@ import {
   Payment,
   FolderIcon,
   UserLine,
+PageIcon,
   // Ai,
   // Messaging,
   Education,
    Analytics,
   Security,
   Feedback,
+  AlertIcon,
   // Setting,
 } from "../icons/index";
 
@@ -73,16 +75,16 @@ const navItems: NavItem[] = [
     name: "Orders Management",
     path: "/orders-management",
   },
-  // {
-  //   icon: <FolderIcon />,
-  //   name: "l Management",
-  //   path: "/reported-user-management",
-  // },
-  // {
-  //   icon: <Messaging />,
-  //   name: "User Communication & Messaging",
-  //   path: "/user-communication",
-  // },
+  {
+    icon: <PageIcon />,
+    name: "Blogs & Content Management",
+    path: "/blog-management",
+  },
+  {
+    icon: <AlertIcon />,
+    name: "News and Insights Management",
+    path: "/news-management",
+  },
   {
     icon: <Education />,
     name: "Training Courses & Education Management",
