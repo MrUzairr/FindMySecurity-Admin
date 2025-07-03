@@ -208,7 +208,7 @@ const handleSave = async () => {
       {popupOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-80 flex items-center justify-center z-50">
 
-          <div className="bg-white text-black p-6 rounded shadow-lg w-full max-w-xl">
+          <div className="bg-white text-black mt-20 p-6 rounded shadow-lg w-full h-auto scroll-auto max-w-xl">
             <h2 className="text-lg font-semibold mb-4">
               {editingAd ? 'Edit Advertisement' : 'Create Advertisement'}
             </h2>
