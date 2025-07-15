@@ -63,14 +63,15 @@ const BlogAdminPage: React.FC = () => {
   const handleImageFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+  
     if (!file.type.startsWith('image/')) {
       setErrors((prev) => ({ ...prev, image: 'Please upload a valid image file.' }));
       return;
     }
-
+  
     try {
       const { fileUrl } = await uploadToS3({ file });
+      console.log("Uploaded image URL:", fileUrl); // ✅ Add this
       setFormData((prev) => ({
         ...prev,
         image: fileUrl,
@@ -81,6 +82,28 @@ const BlogAdminPage: React.FC = () => {
       setErrors((prev) => ({ ...prev, image: 'Image upload failed. Try again.' }));
     }
   };
+  
+  // const handleImageFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+
+  //   if (!file.type.startsWith('image/')) {
+  //     setErrors((prev) => ({ ...prev, image: 'Please upload a valid image file.' }));
+  //     return;
+  //   }
+
+  //   try {
+  //     const { fileUrl } = await uploadToS3({ file });
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       image: fileUrl,
+  //     }));
+  //     setErrors((prev) => ({ ...prev, image: '' }));
+  //   } catch (err) {
+  //     console.error('Image upload failed:', err);
+  //     setErrors((prev) => ({ ...prev, image: 'Image upload failed. Try again.' }));
+  //   }
+  // };
 
   const handleSave = async () => {
     if (!validateForm()) return;
@@ -268,9 +291,16 @@ const BlogAdminPage: React.FC = () => {
               <button onClick={() => setPopupOpen(false)} className="px-4 py-2 bg-gray-300 rounded">
                 Cancel
               </button>
-              <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded">
+              <button
+  onClick={handleSave}
+  className="px-4 py-2 bg-green-600 text-white rounded"
+  disabled={!formData.image} // ✅ disable if image is missing
+>
+  Save
+</button>
+              {/* <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded">
                 Save
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
