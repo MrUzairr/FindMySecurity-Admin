@@ -151,61 +151,80 @@ const formatToMidnightISO = (date: string | Date) => {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-
-
   setLoading(true);
   setError(null);
   setSuccess(null);
 
+  // ✅ List of required fields for validation
+    const requiredFields = [
+            'title', 'issuingAuthority',  'industryType', 
+            'postCode',  'contractStartDate',
+            'contractEndDate', 'approachToMarketDate', 'publishedDate', 
+          ];
+
+  // ✅ Check for any missing (empty) required fields
+  const missingFields = requiredFields.filter(
+    (field) => !form[field as keyof typeof form]?.toString().trim()
+  );
+
+  if (missingFields.length > 0) {
+ setError(`Please fill out the following fields: ${missingFields.join(", ")}`);
+
+    setLoading(false);
+    return;
+  }
+
   try {
-  const payload = {
-  userId: 1,
-  ...form,
-  publishedDate: formatToMidnightISO(form.publishedDate),
-  contractStartDate: formatToMidnightISO(form.contractStartDate),
-  contractEndDate: formatToMidnightISO(form.contractEndDate),
-  approachToMarketDate: formatToMidnightISO(form.approachToMarketDate),
-};
-const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+    const payload = {
+      userId: 1,
+      ...form,
+      publishedDate: formatToMidnightISO(form.publishedDate),
+      contractStartDate: formatToMidnightISO(form.contractStartDate),
+      contractEndDate: formatToMidnightISO(form.contractEndDate),
+      approachToMarketDate: formatToMidnightISO(form.approachToMarketDate),
+    };
+
+    const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+    if (!token) {
+      setError("Authentication token not found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     if (editingJobId) {
       // Update existing job
-      await axios.patch(
-        `${API_URL}/tender/${editingJobId}`,
-        payload,
-          {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-      );
-      setSuccess('Course updated successfully!');
-      setEditingJobId(null); // reset editing state after update
+      await axios.patch(`${API_URL}/tender/${editingJobId}`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setSuccess("Course updated successfully!");
+      setEditingJobId(null);
     } else {
       // Create new job
-      await axios.post(
-  `${API_URL}/tender`,
-  payload,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
-
-      setSuccess('Course created successfully!');
+      await axios.post(`${API_URL}/tender`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setSuccess("Course created successfully!");
     }
 
     setForm(initialForm);
     setShowForm(false);
-  }
-  catch (error: unknown)  {
-    setError(editingJobId ? 'Failed to update job. Please try again.' : 'Failed to create job. Please try again.');
+  } catch (error: unknown) {
+    setError(
+      editingJobId
+        ? "Failed to update job. Please try again."
+        : "Failed to create job. Please try again."
+    );
     console.log(error);
   } finally {
-    fetchJobs(page, limit, searchTerm); // Refresh job list after create/update
+    fetchJobs(page, limit, searchTerm); // Refresh job list
     setLoading(false);
   }
 };
+
 async function fetchJobs(page: number, limit: number, searchTerm: string) {
   setLoading(true);
   setError(null);
@@ -560,15 +579,14 @@ const handleDelete = async (jobId: number) => {
           e.preventDefault();
 
           const requiredFields = [
-            'title', 'issuingAuthority', 'summary', 'industryType', 'location',
-            'postCode', 'contractValue', 'procurementReference', 'contractStartDate',
-            'contractEndDate', 'approachToMarketDate', 'publishedDate', 'issuerName',
-            'issuerAddress', 'issuerPhone', 'issuerEmail', 'issuerWebsite', 'howToApply'
+            'title', 'issuingAuthority',  'industryType', 
+            'postCode',  'contractStartDate',
+            'contractEndDate', 'approachToMarketDate', 'publishedDate', 
           ];
 
           const missing = requiredFields.filter((field) => !form[field]);
           if (missing.length > 0) {
-            setError('Please fill out all required fields.');
+            setError(`Please fill out all required fields. ${missing.join(', ')}`);
             return;
           }
 
@@ -577,28 +595,28 @@ const handleDelete = async (jobId: number) => {
         }}
         className="space-y-4"
       >
-        <Input required label="Tender Title" name="title" value={form.title} onChange={handleChange} placeholder="Enter tender title" />
-        <Input required label="Issuing Authority" name="issuingAuthority" value={form.issuingAuthority} onChange={handleChange} placeholder="Enter tender issuing authority" />
-        <TextArea required label="Summary" name="summary" value={form.summary} onChange={handleChange} placeholder="Brief summary of tender..." />
-        <Input required label="Industry Type" name="industryType" value={form.industryType} onChange={handleChange} placeholder="e.g., Security, IT" />
-        <Input required label="Location" name="location" value={form.location} onChange={handleChange} placeholder="e.g., London" />
-        <Input required label="Post Code" name="postCode" value={form.postCode} onChange={handleChange} placeholder="SW1A 1AA" />
-        <Input required label="Contract Value" name="contractValue" value={form.contractValue} onChange={handleChange} placeholder="£75,000" />
-        <Input required label="Procurement Reference" name="procurementReference" value={form.procurementReference} onChange={handleChange} placeholder="e.g., SEC-2025-045" />
+        <Input  label="Tender Title" name="title" value={form.title} onChange={handleChange} placeholder="Enter tender title" />
+        <Input  label="Issuing Authority" name="issuingAuthority" value={form.issuingAuthority} onChange={handleChange} placeholder="Enter tender issuing authority" />
+    <TextArea   label="Summary" name="summary" value={form.summary} onChange={handleChange} placeholder="Brief summary of tender..." />
+        <Input  label="Industry Type" name="industryType" value={form.industryType} onChange={handleChange} placeholder="e.g., Security, IT" />
+        <Input  label="Location" name="location" value={form.location} onChange={handleChange} placeholder="e.g., London" />
+        <Input  label="Post Code" name="postCode" value={form.postCode} onChange={handleChange} placeholder="SW1A 1AA" />
+        <Input  label="Contract Value" name="contractValue" value={form.contractValue} onChange={handleChange} placeholder="£75,000" />
+        <Input  label="Procurement Reference" name="procurementReference" value={form.procurementReference} onChange={handleChange} placeholder="e.g., SEC-2025-045" />
         
         <Checkbox label="Suitable for SMEs" name="suitableForSMEs" checked={form.suitableForSMEs} onChange={handleCheckboxChange} />
         <Checkbox label="Suitable for VCSEs" name="suitableForVCSEs" checked={form.suitableForVCSEs} onChange={handleCheckboxChange} />
 
-        <Input required type="datetime-local" label="Contract Start Date" name="contractStartDate" value={form.contractStartDate} onChange={handleChange} />
-        <Input required type="datetime-local" label="Contract End Date" name="contractEndDate" value={form.contractEndDate} onChange={handleChange} />
-        <Input required type="datetime-local" label="Approach to Market Date" name="approachToMarketDate" value={form.approachToMarketDate} onChange={handleChange} />
-        <Input required type="datetime-local" label="Publish Date" name="publishedDate" value={form.publishedDate} onChange={handleChange} />
-        <Input required label="Issuer Name" name="issuerName" value={form.issuerName} onChange={handleChange} />
-        <Input required label="Issuer Address" name="issuerAddress" value={form.issuerAddress} onChange={handleChange} />
-        <Input required label="Issuer Phone" name="issuerPhone" value={form.issuerPhone} onChange={handleChange} />
-        <Input required label="Issuer Email" name="issuerEmail" value={form.issuerEmail} onChange={handleChange} />
-        <Input required label="Issuer Website" name="issuerWebsite" value={form.issuerWebsite} onChange={handleChange} />
-        <TextArea required label="How to Apply" name="howToApply" value={form.howToApply} onChange={handleChange} placeholder="Instructions to apply..." />
+        <Input  type="datetime-local" label="Contract Start Date" name="contractStartDate" value={form.contractStartDate} onChange={handleChange} />
+        <Input  type="datetime-local" label="Contract End Date" name="contractEndDate" value={form.contractEndDate} onChange={handleChange} />
+        <Input  type="datetime-local" label="Approach to Market Date" name="approachToMarketDate" value={form.approachToMarketDate} onChange={handleChange} />
+        <Input  type="datetime-local" label="Publish Date" name="publishedDate" value={form.publishedDate} onChange={handleChange} />
+        <Input  label="Issuer Name" name="issuerName" value={form.issuerName} onChange={handleChange} />
+        <Input  label="Issuer Address" name="issuerAddress" value={form.issuerAddress} onChange={handleChange} />
+        <Input  label="Issuer Phone" name="issuerPhone" value={form.issuerPhone} onChange={handleChange} />
+        <Input  label="Issuer Email" name="issuerEmail" value={form.issuerEmail} onChange={handleChange} />
+        <Input  label="Issuer Website" name="issuerWebsite" value={form.issuerWebsite} onChange={handleChange} />
+        <TextArea  label="How to Apply" name="howToApply" value={form.howToApply} onChange={handleChange} placeholder="Instructions to apply..." />
 
         <button
           type="submit"
@@ -622,7 +640,7 @@ type InputProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
-  required: boolean;
+  required?: boolean;
   placeholder?: string;
 };
 
@@ -633,7 +651,7 @@ const Input = ({ label, name, value, onChange, type = "text", placeholder = "" }
       type={type}
       name={name}
       value={value}
-      required
+      
       onChange={onChange}
       placeholder={placeholder}
       className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -647,7 +665,7 @@ type TextAreaProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
-  required: boolean;
+  required?: boolean;
 
 };
 
@@ -658,7 +676,7 @@ const TextArea = ({ label, name, value, onChange, placeholder }: TextAreaProps) 
       name={name}
       value={value}
       onChange={onChange}
-      required
+      
       placeholder={placeholder}
       rows={3}
       className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"

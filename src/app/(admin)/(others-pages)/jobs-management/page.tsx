@@ -97,59 +97,86 @@ export default function JobsPage() {
 
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-  
-    try {
-      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
-      if (!token) throw new Error("No token found in localStorage");
-  
-      const payload = {
-        userId: 1,
-        ...form,
-        salaryRate: parseFloat(form.salaryRate),
-      };
-  
-      if (editingJobId) {
-        // Update existing job
-        await axios.patch(
-          `${API_URL}/admin/jobs/${editingJobId}`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Add token to Authorization header
-            },
-          }
-        );
-        setSuccess('Job updated successfully!');
-        setEditingJobId(null); // reset editing state after update
-      } else {
-        // Create new job
-        await axios.post(
-          `${API_URL}/admin/jobs`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Add token to Authorization header
-            },
-          }
-        );
-        setSuccess('Job created successfully!');
-      }
-  
-      setForm(initialForm);
-      setShowForm(false);
-    } catch (error: unknown) {
-      setError(editingJobId ? 'Failed to update job. Please try again.' : 'Failed to create job. Please try again.');
-      console.log(error);
-    } finally {
-      fetchJobs(page, limit, searchTerm); // Refresh job list after create/update
-      setLoading(false);
-    }
+  e.preventDefault();
+
+  setLoading(true);
+  setError(null);
+  setSuccess(null);
+
+  // ✅ List of required fields
+  const requiredFields = [
+    "jobTitle",
+    "jobType",
+    "industryCategory",
+    "region",
+    "postcode",
+    "salaryRate",
+    "salaryType",
+    "jobDescription",
+    "requiredExperience",
+    "requiredLicences",
+    "shiftAndHours",
+    "startDate",
+    "deadline",
+    "link"
+  ];
+
+  // ✅ Check for missing fields
+  const missingFields = requiredFields.filter(
+    (field) => !form[field as keyof typeof form]?.toString().trim()
+  );
+
+  if (missingFields.length > 0) {
+   setError(`Please fill out the following fields: ${missingFields.join(", ")}`);
+
+    setLoading(false);
+    return;
+  }
+
+  const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+  if (!token) {
+    setError("Authentication token not found. Please log in again.");
+    setLoading(false);
+    return;
+  }
+
+  const payload = {
+    userId: 1,
+    ...form,
+    salaryRate: parseFloat(form.salaryRate),
   };
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    if (editingJobId) {
+      await axios.patch(`${API_URL}/admin/jobs/${editingJobId}`, payload, config);
+      setSuccess("Job updated successfully!");
+      setEditingJobId(null);
+    } else {
+      await axios.post(`${API_URL}/admin/jobs`, payload, config);
+      setSuccess("Job created successfully!");
+    }
+
+    setForm(initialForm);
+    setShowForm(false);
+  } catch (error: any) {
+    console.error(error);
+    const message = editingJobId
+      ? "Failed to update job. Please try again."
+      : "Failed to create job. Please try again.";
+
+    setError(message);
+  } finally {
+    fetchJobs(page, limit, searchTerm);
+    setLoading(false);
+  }
+};
+
 
    async function fetchJobs(page: number, limit: number, searchTerm: string) {
     setLoading(true);
